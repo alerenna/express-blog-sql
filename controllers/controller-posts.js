@@ -1,17 +1,26 @@
 const posts = require('../data/posts')
+const connection = require('../data/db')
 
-function index(req,res) {
+function index(req, res) {
 
-    let postsFiltered = posts
+    const sql = 'SELECT * FROM posts'
+    connection.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ error: 'Query Failed' })
+
+        console.log(results);
+        res.json(results)
+    })
+
+    /* let postsFiltered = posts
 
     if (req.query.tag) {
         postsFiltered = posts.filter(post => post.tags.includes(req.query.tag))
     }
     
-    res.json(postsFiltered);
+    res.json(postsFiltered); */
 }
 
-function show(req,res) { 
+function show(req, res) {
     const post = posts.find(post => post.slug === req.params.id)
 
     if (!post) {
@@ -26,13 +35,13 @@ function show(req,res) {
 
 }
 
-function store(req,res) {
+function store(req, res) {
 
     function generateSlug(title) {
         return title
             .toLowerCase()
             .replace(/\s+/g, '-')
-    } 
+    }
 
     const newSlug = generateSlug(req.body.title)
 
@@ -51,15 +60,15 @@ function store(req,res) {
     res.status(201)
 
     res.json(newPost)
-    
+
 }
 
-function update(req,res) {
+function update(req, res) {
     function generateSlug(title) {
         return title
             .toLowerCase()
             .replace(/\s+/g, '-')
-    } 
+    }
 
     const newSlug = generateSlug(req.body.title)
 
@@ -80,16 +89,16 @@ function update(req,res) {
     post.tags = req.body.tags
 
     console.log(posts);
-    
+
 
     res.json(post)
 }
 
-function modify(req,res) {
+function modify(req, res) {
     res.send(`Modify post with slug: ${req.params.slug}`);
 }
 
-function destroy(req,res) {
+function destroy(req, res) {
     const post = posts.find(post => post.slug === req.params.id)
 
     if (!post) {
@@ -102,7 +111,7 @@ function destroy(req,res) {
     posts.splice(posts.indexOf(post), 1)
 
     console.log(posts);
-    
+
     res.sendStatus(204)
 
 }
