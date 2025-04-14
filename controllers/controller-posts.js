@@ -22,17 +22,34 @@ function index(req, res) {
 
 function show(req, res) {
 
-    const postsId = Number(req.params.id)
+    const postId = Number(req.params.id)
 
-    const sql = 'SELECT * FROM posts WHERE id = ?'
+    const sqlPost = 'SELECT * FROM posts WHERE id = ?'
 
-    connection.query(sql, [postsId], (err, resuslts) => {
+    const sqlTags = `
+    SELECT tags.label
+    FROM post_tag
+    JOIN tags ON post_tag.tag_id = tags.id
+    WHERE post_tag.post_id = ?
+    `
+
+    connection.query(sqlPost, [postId], (err, postsResults) => {
         if (err) return res.status(500).json('Invalid query')
-        if (resuslts === 0) return res.status(404).json({ error: 'Posts not found' })
+        if (postsResults === 0) return res.status(404).json({ error: 'Posts not found' })
 
-        const post = resuslts[0]
+        const post = postsResults[0]
 
-        res.json(post)
+        connection.query(sqlTags, [postId], (err, tagsResults) => {
+            if (err) return res.status(500).json('Invalid query')
+
+            console.log(tagsResults);
+            post.tags = tagsResults
+
+
+            res.json(post)
+        })
+
+
     })
 
 
