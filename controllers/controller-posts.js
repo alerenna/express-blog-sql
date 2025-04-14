@@ -99,7 +99,22 @@ function modify(req, res) {
 }
 
 function destroy(req, res) {
-    const post = posts.find(post => post.slug === req.params.id)
+
+    const postId = Number(req.params.id)
+
+    const sql = 'DELETE FROM posts WHERE id = ?'
+
+    connection.query(sql, [postId], (err, results) => {
+        if (err) return res.status(500).json({ error: 'The query is not valid' })
+
+        res.sendStatus(204)
+    })
+
+
+
+
+
+    /* const post = posts.find(post => post.slug === req.params.id)
 
     if (!post) {
         return res.status(404).json({
@@ -112,7 +127,7 @@ function destroy(req, res) {
 
     console.log(posts);
 
-    res.sendStatus(204)
+    res.sendStatus(204) */
 
 }
 
